@@ -3,7 +3,7 @@ import numpy as np
 
 
 class Config:
-    debug = True
+    debug = False
     batch_size = 2 if debug else 32
     image_size = 512
     num_workers = 0 if debug else 2
