@@ -6,7 +6,7 @@ from config import Config
 
 
 class PleuralEffDataset(data.Dataset):
-    def __init__(self, df, transform=None, subset=100, s_deep=2):
+    def __init__(self, df, transform, subset=100, s_deep=2):
         self.transform = transform
         self.s_deep = s_deep
         if subset != 100:

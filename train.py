@@ -42,7 +42,7 @@ def prepare_loaders(debug=False):
     p_train_loader = data.DataLoader(train_dataset,
                                      batch_size=Config.batch_size,
                                      num_workers=Config.num_workers,
-                                     worker_init_fn=lambda x: np.random.seed(torch.initial_seed() // 2 ** 32 + x),
+                                     worker_init_fn=Config.worker_init_fn,
                                      sampler=data.RandomSampler(train_dataset),
                                      pin_memory=True,
                                      drop_last=False)
@@ -244,8 +244,16 @@ def plot_and_save_histories():
 
 
 if __name__ == '__main__':
+    paths = {'root dir': 'e:/train/',
+             'exp dir': 'e:/train/output/',
+             '3d images dir': 'e:/train/3d_images/',
+             '3d masks dir': 'e:/train/3d_masks/',
+             '3d images files': 'e:/train/3d_images/L*/*/*/*',
+             '3d masks files': 'e:/train/3d_masks/L*/*gz',
+             'images train': 'e:/train/data/',
+             'masks train': 'e:/train/data/masks/'}
     set_seed(Config.seed)
-    data_p = DataPreprocessor()
+    data_p = DataPreprocessor(paths)
     df_train = data_p.run()
     train_aug, test_aug = make_train_augmenter(), make_test_augmenter()
     dice_loss = smp.losses.DiceLoss(mode='binary')

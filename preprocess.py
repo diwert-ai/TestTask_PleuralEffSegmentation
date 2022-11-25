@@ -5,18 +5,14 @@ from tqdm import tqdm
 import nibabel as nib
 import cv2
 import SimpleITK as sitk
+import matplotlib.pyplot as plt
+from matplotlib.patches import Rectangle
+import matplotlib.animation as animation
 
 
 class DataPreprocessor:
-    def __init__(self):
-        self.paths = {'root dir': 'e:/train/',
-                      'exp dir': 'e:/train/output/',
-                      '3d images dir': 'e:/train/3d_images/',
-                      '3d masks dir': 'e:/train/3d_masks/',
-                      '3d images files': 'e:/train/3d_images/L*/*/*/*',
-                      '3d masks files': 'e:/train/3d_masks/L*/*gz',
-                      'images train': 'e:/train/data/',
-                      'masks train': 'e:/train/data/masks/'}
+    def __init__(self, paths):
+        self.paths = paths
         self.images_3d_paths = []
         self.masks_3d_paths = []
         self.images_list = []
@@ -87,6 +83,29 @@ class DataPreprocessor:
         df.to_csv(self.paths['root dir'] + 'train.csv', index=False)
         return df
 
+    def get_3d_masked_img_ani(self, img_3d_num, start_slice, stop_slice):
+        test_images_path = self.images_3d_paths[img_3d_num]
+        test_masks_path = self.masks_3d_paths[img_3d_num]
+        test_images_3d = self.load_dicom(test_images_path)
+        max_slice_num = test_images_3d.shape[0]
+        test_masks_3d = nib.load(test_masks_path)
+        test_masks_3d = test_masks_3d.get_fdata().transpose(2, 0, 1)
+
+        fig, ax = plt.subplots()
+        ims = []
+        lung_label = test_images_path[self.pref_img_len:self.pref_img_len + self.lung_len]
+        plt.legend([Rectangle((0, 0), 1, 1)], [lung_label])
+
+        for slice_num in range(min(start_slice, max_slice_num), min(stop_slice, max_slice_num)):
+            img, msk = test_images_3d[slice_num], test_masks_3d[slice_num]
+            msk = cv2.rotate(msk, cv2.ROTATE_90_COUNTERCLOCKWISE)
+            im1 = ax.imshow(img, cmap='bone', animated=True)
+            im2 = ax.imshow(msk, alpha=0.4, animated=True)
+            ims.append([im1, im2])
+
+        ani = animation.ArtistAnimation(fig, ims, interval=100, blit=True, repeat_delay=1000)
+        return ani
+
     def run(self):
         self.get_3d_paths()
         self.save_png_slices()
@@ -94,7 +113,15 @@ class DataPreprocessor:
 
 
 def test_process_data():
-    data_prep = DataPreprocessor()
+    paths = {'root dir': 'e:/train/',
+             'exp dir': 'e:/train/output/',
+             '3d images dir': 'e:/train/3d_images/',
+             '3d masks dir': 'e:/train/3d_masks/',
+             '3d images files': 'e:/train/3d_images/L*/*/*/*',
+             '3d masks files': 'e:/train/3d_masks/L*/*gz',
+             'images train': 'e:/train/data/',
+             'masks train': 'e:/train/data/masks/'}
+    data_prep = DataPreprocessor(paths)
     print(data_prep.run())
 
 

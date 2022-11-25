@@ -1,10 +1,12 @@
 import torch
+import numpy as np
 
 
 class Config:
-    batch_size = 32
+    debug = True
+    batch_size = 2 if debug else 32
     image_size = 512
-    num_workers = 2
+    num_workers = 0 if debug else 2
     seed = 1276312
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     model_arch = 'Unet'
@@ -12,10 +14,9 @@ class Config:
     num_classes = 1
     in_channels = 5
     pretrained = True
-    epochs = 30
+    epochs = 3 if debug else 30
     val_freq = 1
     scheduler = 'ExponentialLR'
-    debug = False
     lr = 0.001
     min_lr = 1e-6
     wd = 1e-6
@@ -26,3 +27,4 @@ class Config:
     crop_size = 1.0
     max_cutout = 20
     strong_aug = False
+    worker_init_fn = None if debug else (lambda x: np.random.seed(torch.initial_seed() // 2 ** 32 + x))
