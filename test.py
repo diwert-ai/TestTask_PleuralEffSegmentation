@@ -65,8 +65,8 @@ def get_3d_masked_img_ani(img_3d_num, start_slice, stop_slice):
         im2 = ax.imshow(msk, alpha=0.4, animated=True)
         ims.append([im1, im2])
 
-    ani = animation.ArtistAnimation(fig, ims, interval=100, blit=True,
-                                    repeat_delay=1000)
+        animation.ArtistAnimation(fig, ims, interval=100, blit=True,
+                                  repeat_delay=1000)
     plt.show()
 
 

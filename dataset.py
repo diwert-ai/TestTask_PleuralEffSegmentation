@@ -55,5 +55,3 @@ class PleuralEffDataset(data.Dataset):
 
     def __len__(self):
         return self.length
-
-
