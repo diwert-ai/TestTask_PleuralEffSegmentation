@@ -73,17 +73,17 @@ def criterion(y_pred, y_true):
     return dice_loss(y_pred, y_true)
 
 
+@torch.no_grad()
 def do_inference():
     model.eval()
     pbar = tqdm(enumerate(test_loader), total=len(test_loader), desc='Test ')
     test_dice_list = []
-    with torch.no_grad():
-        for step, (images, masks) in pbar:
-            images = images.to(Config.device, dtype=torch.float)
-            masks = masks.to(Config.device, dtype=torch.float)
-            y_pred = model(images)
-            y_pred = sigmoid(y_pred).round().to(torch.float32)
-            test_dice_list.append(dice_coefficient(masks, y_pred).item())
+    for step, (images, masks) in pbar:
+        images = images.to(Config.device, dtype=torch.float)
+        masks = masks.to(Config.device, dtype=torch.float)
+        y_pred = model(images)
+        y_pred = sigmoid(y_pred).round().to(torch.float32)
+        test_dice_list.append(dice_coefficient(masks, y_pred).item())
     test_dice_mean = np.mean(test_dice_list)
     torch.cuda.empty_cache()
     _ = gc.collect()
