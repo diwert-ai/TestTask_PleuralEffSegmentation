@@ -4,8 +4,9 @@ import segmentation_models_pytorch as smp
 
 
 class ModelWrapper(torch.nn.Module):
-    def __init__(self):
+    def __init__(self, pretrained=True):
         super().__init__()
+        self.pretrained = pretrained
         if Config.model_arch == 'FPN':
             arch = smp.FPN
         elif Config.model_arch == 'Unet':
@@ -15,7 +16,7 @@ class ModelWrapper(torch.nn.Module):
         else:
             assert 0, f'Unknown architecture {Config.model_arch}'
 
-        weights = 'imagenet' if Config.pretrained else None
+        weights = 'imagenet' if self.pretrained else None
         self.model = arch(
             encoder_name=Config.model_backbone, encoder_weights=weights, in_channels=Config.in_channels,
             classes=Config.num_classes, activation=None)

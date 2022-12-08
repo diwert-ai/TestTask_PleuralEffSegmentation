@@ -33,11 +33,16 @@ def set_seed(seed=42):
 def prepare_loaders(debug=False):
     train_df = df_train.query("split=='train'").reset_index(drop=True)
     valid_df = df_train.query("split=='valid'").reset_index(drop=True)
+    test_df = df_train.query("split=='test'").reset_index(drop=True)
+
     if debug:
         train_df = train_df.head(Config.batch_size * 3)
         valid_df = valid_df.head(Config.batch_size * 1)
+        test_df = test_df.head(Config.batch_size * 1)
+
     train_dataset = PleuralEffDataset(train_df, transform=train_aug)
     valid_dataset = PleuralEffDataset(valid_df, transform=test_aug)
+    test_dataset = PleuralEffDataset(test_df, transform=test_aug)
 
     p_train_loader = data.DataLoader(train_dataset,
                                      batch_size=Config.batch_size,
@@ -53,20 +58,13 @@ def prepare_loaders(debug=False):
                                      sampler=data.SequentialSampler(valid_dataset),
                                      pin_memory=True)
 
-    return p_train_loader, p_valid_loader
-
-
-def prepare_test_loader(debug=False):
-    test_df = df_train.query("split=='test'").reset_index(drop=True)
-    if debug:
-        test_df = test_df.head(Config.batch_size * 1)
-    test_dataset = PleuralEffDataset(test_df, transform=test_aug)
     p_test_loader = data.DataLoader(test_dataset,
                                     batch_size=Config.batch_size,
                                     num_workers=Config.num_workers,
                                     sampler=data.SequentialSampler(test_dataset),
                                     pin_memory=True)
-    return p_test_loader
+
+    return p_train_loader, p_valid_loader, p_test_loader
 
 
 def criterion(y_pred, y_true):
@@ -244,24 +242,15 @@ def plot_and_save_histories():
 
 
 if __name__ == '__main__':
-    paths = {'root dir': 'e:/train/',
-             'exp dir': 'e:/train/output/',
-             '3d images dir': 'e:/train/3d_images/',
-             '3d masks dir': 'e:/train/3d_masks/',
-             '3d images files': 'e:/train/3d_images/L*/*/*/*',
-             '3d masks files': 'e:/train/3d_masks/L*/*gz',
-             'images train': 'e:/train/data/',
-             'masks train': 'e:/train/data/masks/'}
     set_seed(Config.seed)
-    data_p = DataPreprocessor(paths)
+    data_p = DataPreprocessor(Config.paths)
     df_train = data_p.run()
     train_aug, test_aug = make_train_augmenter(), make_test_augmenter()
     dice_loss = smp.losses.DiceLoss(mode='binary')
     sigmoid = torch.nn.Sigmoid()
-    test_loader = prepare_test_loader(debug=Config.debug)
-    train_loader, valid_loader = prepare_loaders(debug=Config.debug)
+    train_loader, valid_loader, test_loader = prepare_loaders(debug=Config.debug)
     histories = dict()
-    model = ModelWrapper()
+    model = ModelWrapper(pretrained=Config.pretrained)
     model.to(Config.device)
     optimizer = optim.Adam(model.parameters(), lr=Config.lr, weight_decay=Config.wd)
     scheduler = fetch_scheduler()

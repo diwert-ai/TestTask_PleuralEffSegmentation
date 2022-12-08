@@ -8,6 +8,7 @@ import SimpleITK as sitk
 import matplotlib.pyplot as plt
 from matplotlib.patches import Rectangle
 import matplotlib.animation as animation
+from config import Config
 
 
 class DataPreprocessor:
@@ -106,22 +107,21 @@ class DataPreprocessor:
         ani = animation.ArtistAnimation(fig, ims, interval=100, blit=True, repeat_delay=1000)
         return ani
 
+    def clear_lists(self):
+        self.images_3d_paths.clear()
+        self.masks_3d_paths.clear()
+        self.images_list.clear()
+        self.masks_list.clear()
+
     def run(self):
+        self.clear_lists()
         self.get_3d_paths()
         self.save_png_slices()
         return self.make_metadata_frame()
 
 
 def test_process_data():
-    paths = {'root dir': 'e:/train/',
-             'exp dir': 'e:/train/output/',
-             '3d images dir': 'e:/train/3d_images/',
-             '3d masks dir': 'e:/train/3d_masks/',
-             '3d images files': 'e:/train/3d_images/L*/*/*/*',
-             '3d masks files': 'e:/train/3d_masks/L*/*gz',
-             'images train': 'e:/train/data/',
-             'masks train': 'e:/train/data/masks/'}
-    data_prep = DataPreprocessor(paths)
+    data_prep = DataPreprocessor(Config.paths)
     print(data_prep.run())
 
 

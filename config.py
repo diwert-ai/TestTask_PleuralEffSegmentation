@@ -3,6 +3,14 @@ import numpy as np
 
 
 class Config:
+    paths = {'root dir': 'e:/train/',
+             'exp dir': 'e:/train/output/',
+             '3d images dir': 'e:/train/3d_images/',
+             '3d masks dir': 'e:/train/3d_masks/',
+             '3d images files': 'e:/train/3d_images/L*/*/*/*',
+             '3d masks files': 'e:/train/3d_masks/L*/*gz',
+             'images train': 'e:/train/data/',
+             'masks train': 'e:/train/data/masks/'}
     debug = False
     batch_size = 2 if debug else 32
     image_size = 512
