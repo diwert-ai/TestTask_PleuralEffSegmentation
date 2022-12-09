@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 from augment import make_train_augmenter
 
 
-def test_pl_dataset():
+def win_test_pl_dataset():
     df_train = pd.read_csv('e:/train/train.csv')
     dataset = PleuralEffDataset(df_train, transform=make_train_augmenter())
     loader = data.DataLoader(dataset,
@@ -39,4 +39,4 @@ def test_pl_dataset():
 
 
 if __name__ == '__main__':
-    test_pl_dataset()
+    win_test_pl_dataset()

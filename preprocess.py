@@ -120,10 +120,10 @@ class DataPreprocessor:
         return self.make_metadata_frame()
 
 
-def test_process_data():
-    data_prep = DataPreprocessor(Config.paths)
+def win_test_process_data():
+    data_prep = DataPreprocessor(Config.paths_win)
     print(data_prep.run())
 
 
 if __name__ == '__main__':
-    test_process_data()
+    win_test_process_data()
