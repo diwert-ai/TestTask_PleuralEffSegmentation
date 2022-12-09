@@ -241,9 +241,11 @@ def plot_and_save_histories():
     fig.savefig(data_p.paths['exp dir'] + 'fig.png')
 
 
+# run on local Windows machine
+# colab version see in baseline_refactored.ipynb
 if __name__ == '__main__':
     set_seed(Config.seed)
-    data_p = DataPreprocessor(Config.paths)
+    data_p = DataPreprocessor(Config.paths_win)
     df_train = data_p.run()
     train_aug, test_aug = make_train_augmenter(), make_test_augmenter()
     dice_loss = smp.losses.DiceLoss(mode='binary')
